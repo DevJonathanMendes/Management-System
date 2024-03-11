@@ -11,8 +11,8 @@ export class TransformDataPipe implements PipeTransform {
   transform(data: CreateCustomerDto, metadata: ArgumentMetadata) {
     try {
       this.formatString(data, 'name');
-      this.LowerAndTrim(data, 'email');
-      this.LowerAndTrim(data, 'telephone');
+      this.lowerAndTrim(data, 'email');
+      this.lowerAndTrim(data, 'telephone');
 
       return data;
     } catch (err) {
@@ -25,7 +25,7 @@ export class TransformDataPipe implements PipeTransform {
       data[key] = this.rmSpaces(data[key]);
   }
 
-  private LowerAndTrim(data: CreateCustomerDto, key: string) {
+  private lowerAndTrim(data: CreateCustomerDto, key: string) {
     if (data[key] && typeof data[key] === 'string')
       data[key] = data[key].toLocaleLowerCase().trim();
   }

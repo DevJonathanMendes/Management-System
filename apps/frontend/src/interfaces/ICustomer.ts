@@ -1,8 +1,5 @@
-export interface ICustomer {
-	id?: number | string;
-	name: string;
-	email: string;
-	telephone: string;
-	coordinate_x: string;
-	coordinate_y: string;
+export interface IEntity {
+  username: string;
+  email?: string;
+  password: string;
 }

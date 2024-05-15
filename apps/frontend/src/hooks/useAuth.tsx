@@ -1,45 +1,41 @@
-import { ReactElement, createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useLocalStorage } from "./useLocalStorage";
 
 interface Props {
-  children: ReactElement;
+  children: React.ReactNode;
 }
 
-const AuthContext = createContext({});
+interface AuthContextProps {
+  user: { username: string } | null;
+  signIn: (data: { username: string }) => void;
+  signOut: () => void;
+}
 
-export const AuthProvider = ({ children }: Props) => {
+const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  signIn: () => {},
+  signOut: () => {},
+});
+
+export const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useLocalStorage("user", null);
   const navigate = useNavigate();
 
-  // call this function when you want to authenticate the user
-  interface IEntity {
-    username: string;
-    token: string;
-  }
-
-  const signIn = async (data: IEntity) => {
+  const signIn = async (data: { username: string }) => {
     setUser(data);
     navigate("/protected");
   };
 
-  // call this function to sign out logged in user
   const signOut = () => {
     setUser(null);
     navigate("/", { replace: true });
   };
 
-  const value = useMemo(
-    () => ({
-      user,
-      signIn,
-      signOut,
-    }),
-    [user]
-  );
+  const value = useMemo(() => ({ user, signIn, signOut }), [user]);
 
-  return <AuthContext.Provider value={value} children={children} />;
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {

@@ -1,20 +1,23 @@
-import { useState } from "react";
 import { Button, Container, Form, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import API from "../api/fetch";
+import { FormInput } from "../components/forms/FormInput";
 import { useAuth } from "../hooks/useAuth";
+import { useForm } from "../hooks/useForm";
 
 export const SignUpPage = () => {
-  const [username, setUsername] = useState("admin");
-  const [email, setEmail] = useState(`${username}@email.com`);
-  const [password, setPassword] = useState("admin");
-  const { signIn }: any = useAuth();
+  const { signIn } = useAuth();
+  const {
+    username, setUsername,
+    email, setEmail,
+    password, setPassword
+  } = useForm();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (await API("signup", { username, email, password })) {
-      await signIn({ username });
+      signIn({ username });
     }
   };
 
@@ -23,38 +26,30 @@ export const SignUpPage = () => {
       <Form onSubmit={handleSubmit}>
         <Stack gap={4}>
           <h1>Create your account</h1>
-          <Form.Group controlId="username">
-            <Form.Label>Username</Form.Label>
-            <Form.Control
-              required
-              type="text"
-              placeholder="Enter username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="email">
-            <Form.Label>E-mail</Form.Label>
-            <Form.Control
-              required
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="password">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              required
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
+          <FormInput
+            label="Username"
+            type="text"
+            value={username}
+            setValue={setUsername}
+            placeholder="Enter username"
+            required
+          />
+          <FormInput
+            label="Email"
+            type="email"
+            value={email}
+            setValue={setEmail}
+            placeholder="Enter e-mail"
+            required
+          />
+          <FormInput
+            label="Password"
+            type="password"
+            value={password}
+            setValue={setPassword}
+            placeholder="Enter password"
+            required
+          />
 
           <Button type="submit">Sing Up</Button>
           <p className="text-center">

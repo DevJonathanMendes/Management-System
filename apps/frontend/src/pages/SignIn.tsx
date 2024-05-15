@@ -1,19 +1,23 @@
-import { useState } from "react";
+import React from "react";
 import { Button, Container, Form, Stack } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import API from "../api/fetch";
+import { FormInput } from "../components/forms/FormInput";
 import { useAuth } from "../hooks/useAuth";
+import { useForm } from "../hooks/useForm";
 
-export const SignInPage = () => {
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin");
-  const { signIn }: any = useAuth();
+export const SignInPage: React.FC = () => {
+  const { signIn } = useAuth();
+  const {
+    username, setUsername,
+    password, setPassword
+  } = useForm();
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (await API("signin", { username, password })) {
-      await signIn({ username });
+      signIn({ username });
     }
   };
 
@@ -22,29 +26,23 @@ export const SignInPage = () => {
       <Form onSubmit={handleSubmit}>
         <Stack gap={4}>
           <h1>Login to your account</h1>
-          <Form.Group controlId="username">
-            <Form.Label>Username</Form.Label>
-            <Form.Control
-              required
-              type="text"
-              placeholder="Enter username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group controlId="password">
-            <Form.Label>Password</Form.Label>
-            <Form.Control
-              required
-              type="password"
-              placeholder="Enter password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </Form.Group>
-
-          <Button type="submit">Sing In</Button>
+          <FormInput
+            label="Username"
+            type="text"
+            value={username}
+            setValue={setUsername}
+            placeholder="Enter username"
+            required
+          />
+          <FormInput
+            label="Password"
+            type="password"
+            value={password}
+            setValue={setPassword}
+            placeholder="Enter password"
+            required
+          />
+          <Button type="submit">Sign In</Button>
           <p className="text-center">
             <small>
               <Link to="/signup">Don't have an account?</Link>

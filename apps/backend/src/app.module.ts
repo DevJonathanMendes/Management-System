@@ -1,16 +1,10 @@
 import { Module } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { AppService } from './app.service';
-import { CustomersModule } from './customers/customers.module';
+import { ConfigModule } from '@nestjs/config';
+
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../..', 'frontend', 'dist'),
-    }),
-    CustomersModule,
-  ],
-  providers: [AppService],
+  imports: [ConfigModule.forRoot(), AuthModule, UsersModule],
 })
 export class AppModule {}

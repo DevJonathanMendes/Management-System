@@ -5,7 +5,7 @@ export const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <Stack gap={2}>
+    <Stack gap={4}>
       <h1>Management System</h1>
       <Button onClick={() => navigate("/signin")}>Sign in</Button>
       <Button variant="secondary" onClick={() => navigate("/signup")}>

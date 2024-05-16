@@ -5,28 +5,18 @@ interface FormInputProps {
   label: string;
   type: string;
   value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  onChange: React.Dispatch<React.SetStateAction<string>>;
   placeholder?: string;
   required?: boolean;
 }
 
-export const FormInput: React.FC<FormInputProps> = ({
-  label,
-  type,
-  value,
-  setValue,
-  placeholder,
-  required = false,
-}) => {
+export const FormInput: React.FC<FormInputProps> = (props) => {
   return (
-    <Form.Group controlId={label.toLowerCase()}>
-      <Form.Label>{label}</Form.Label>
+    <Form.Group controlId={props.label.toLowerCase()}>
+      <Form.Label>{props.label}</Form.Label>
       <Form.Control
-        type={type}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder={placeholder}
-        required={required}
+        {...props}
+        onChange={(e) => props.onChange(e.target.value)}
       />
     </Form.Group>
   );

@@ -7,10 +7,10 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { CreateUserDto } from '../users/dto/create-user.dto';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
+import { CreateSellerDto } from '../sellers/dto/create-seller.dto';
+import { UpdateSellerDto } from '../sellers/dto/update-seller.dto';
 
-import { UsersService } from '../users/users.service';
+import { SellersService } from '../sellers/sellers.service';
 import { AuthService } from './auth.service';
 import { Public } from './decorators/public.decorator';
 
@@ -19,24 +19,24 @@ import { Public } from './decorators/public.decorator';
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private usersService: UsersService,
+    private sellersService: SellersService,
   ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('signin')
-  async signIn(@Body() data: UpdateUserDto) {
+  async signIn(@Body() data: UpdateSellerDto) {
     return this.authService.signIn(data);
   }
 
   @Post('signup')
-  async signUp(@Body() data: CreateUserDto) {
+  async signUp(@Body() data: CreateSellerDto) {
     const { username, email } = data;
-    const partners = await this.usersService.findAny({ username }, { email });
+    const partners = await this.sellersService.findAny({ username }, { email });
 
     const message: string[] = [];
-    partners.forEach((user) => {
-      if (user.username === username) message.push('username already exists');
-      if (user.email === email) message.push('email already exists');
+    partners.forEach((seller) => {
+      if (seller.username === username) message.push('username already exists');
+      if (seller.email === email) message.push('email already exists');
     });
 
     if (message.length > 0) {

@@ -2,27 +2,27 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
 
-import { UsersService } from '../users/users.service';
-import { UpdateUserDto } from '../users/dto/update-user.dto';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateSellerDto } from '../sellers/dto/create-seller.dto';
+import { UpdateSellerDto } from '../sellers/dto/update-seller.dto';
+import { SellersService } from '../sellers/sellers.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
+    private sellersService: SellersService,
     private jwtService: JwtService,
   ) {}
 
-  async signIn(data) {
-    const user = await this.usersService.findUnique(data.username);
+  async signIn(data: UpdateSellerDto) {
+    const seller = await this.sellersService.findUnique(data.username);
 
-    if (user?.password !== this.passwordHash(data.password)) {
-      throw new UnauthorizedException(
-        'User does not exist or password is incorrect',
-      );
+    if (seller?.password !== this.passwordHash(data.password)) {
+      throw new UnauthorizedException([
+        'Seller does not exist or password is incorrect',
+      ]);
     }
 
-    const payload = { username: user.username, sub: user.id };
+    const payload = { username: seller.username, sub: seller.id };
 
     return {
       username: data.username,
@@ -30,10 +30,10 @@ export class AuthService {
     };
   }
 
-  async signUp(data: CreateUserDto) {
+  async signUp(data: CreateSellerDto) {
     data.password = this.passwordHash(data.password);
-    const newUser = await this.usersService.create(data);
-    const { username, password } = newUser;
+    const newSeller = await this.sellersService.create(data);
+    const { username, password } = newSeller;
 
     return {
       username,

@@ -40,7 +40,7 @@ export class AuthGuard implements CanActivate {
         secret: process.env.JWT_SECRET,
       });
 
-      req['user'] = payload;
+      req['seller'] = payload;
     } catch {
       throw new UnauthorizedException([
         'Sign up, log in or purchase an access token',

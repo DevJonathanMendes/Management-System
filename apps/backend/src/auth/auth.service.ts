@@ -2,51 +2,39 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { createHash } from 'crypto';
 
-import { CreateSellerDto } from '../sellers/dto/create-seller.dto';
 import { UpdateSellerDto } from '../sellers/dto/update-seller.dto';
+import { SellerEntity } from '../sellers/entities/seller.entity';
 import { SellersService } from '../sellers/sellers.service';
+
+type IUserToken = {
+  id: string;
+  username: string;
+  token: string;
+};
+
+interface SignToken {
+  (seller: SellerEntity, data?: UpdateSellerDto): IUserToken;
+}
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private sellersService: SellersService,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private jwtService: JwtService) {}
 
-  async signIn(data: UpdateSellerDto) {
-    const seller = await this.sellersService.findUnique(data.username);
+  signToken: SignToken = (seller, data = null) => {
+    if (data)
+      if (data.password !== seller.password) {
+        throw new UnauthorizedException(['Incorrect password']);
+      }
 
-    if (seller?.password !== this.passwordHash(data.password)) {
-      throw new UnauthorizedException([
-        'Seller does not exist or password is incorrect',
-      ]);
-    }
+    return this.createPayload(seller);
+  };
 
-    const payload = { username: seller.username, sub: seller.id };
+  private createPayload({ id, username }: SellerEntity): IUserToken {
+    const payload = { id, username };
 
     return {
-      username: data.username,
-      token: await this.jwtService.signAsync(payload),
+      ...payload,
+      token: this.jwtService.sign({ payload }),
     };
-  }
-
-  async signUp(data: CreateSellerDto) {
-    data.password = this.passwordHash(data.password);
-    const newSeller = await this.sellersService.create(data);
-    const { username, password } = newSeller;
-
-    return {
-      username,
-      token: this.jwtService.sign({
-        username,
-        password,
-      }),
-    };
-  }
-
-  private passwordHash(password: string) {
-    return createHash('sha256')
-      .update(password + process.env.JWT_SECRET)
-      .digest('hex');
   }
 }

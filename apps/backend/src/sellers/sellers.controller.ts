@@ -3,22 +3,44 @@ import {
   Body,
   Controller,
   Get,
-  Param,
+  HttpCode,
+  HttpStatus,
   Post,
 } from '@nestjs/common';
 
 import { CreateSellerDto } from './dto/create-seller.dto';
+import { UpdateSellerDto } from './dto/update-seller.dto';
 import { SellerEntity } from './entities/seller.entity';
 import { SellersService } from './sellers.service';
 
+import { AuthService } from '../auth/auth.service';
+import { Public } from '../auth/decorators/public.decorator';
+
 @Controller('sellers')
 export class SellersController {
-  constructor(private readonly sellerService: SellersService) {}
+  constructor(
+    private sellersService: SellersService,
+    private authService: AuthService,
+  ) {}
 
-  @Post()
-  async create(@Body() data: CreateSellerDto): Promise<SellerEntity> {
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @Post('signin')
+  async signIn(@Body() data: UpdateSellerDto) {
+    const seller = await this.sellersService.findUniqueByUsername(data);
+
+    if (!seller) {
+      throw new BadRequestException(['Seller does not exist']);
+    }
+
+    return this.authService.signToken(seller, data);
+  }
+
+  @Public()
+  @Post('signup')
+  async signin(@Body() data: CreateSellerDto) {
     const { username, email } = data;
-    const partners = await this.sellerService.findAny({ username }, { email });
+    const partners = await this.sellersService.findAny({ username }, { email });
 
     const message: string[] = [];
     partners.forEach((seller) => {
@@ -30,16 +52,13 @@ export class SellersController {
       throw new BadRequestException(message);
     }
 
-    return this.sellerService.create(data);
-  }
+    const newSeller = await this.sellersService.create(data);
 
-  @Get('username/:username')
-  findUnique(@Param('username') value: string): Promise<SellerEntity> {
-    return this.sellerService.findUnique(value);
+    return this.authService.signToken(newSeller);
   }
 
   @Get()
   findAll(): Promise<SellerEntity[]> {
-    return this.sellerService.findAll();
+    return this.sellersService.findAll();
   }
 }

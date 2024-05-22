@@ -17,7 +17,7 @@ export class SellersService {
     return this.prisma.sellers.update({ where: { id }, data });
   }
 
-  findUnique(username: string): Promise<SellerEntity> {
+  findUniqueByUsername({ username }: UpdateSellerDto): Promise<SellerEntity> {
     return this.prisma.sellers.findUnique({ where: { username } });
   }
 

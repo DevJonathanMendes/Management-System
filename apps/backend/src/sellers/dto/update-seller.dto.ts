@@ -1,20 +1,24 @@
-import { IsEmail, IsOptional, IsString } from 'class-validator';
+import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
 import { CreateSellerDto } from './create-seller.dto';
 
 export class UpdateSellerDto extends CreateSellerDto {
-  @IsString()
   @IsOptional()
+  @IsString()
+  @Length(2, 64)
   name: string;
 
-  @IsEmail()
   @IsOptional()
+  @IsEmail()
+  @Length(2, 64)
   email: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
+  @Length(2, 64)
   username: string;
 
-  @IsString()
   @IsOptional()
+  @IsString()
+  @Length(2, 64)
   password: string;
 }

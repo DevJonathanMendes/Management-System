@@ -17,33 +17,28 @@ export class AuthGuard implements CanActivate {
     private reflector: Reflector,
   ) {}
 
-  async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const req = ctx.switchToHttp().getRequest();
-    const token = this.extractTokenFromHeader(req);
+  canActivate(ctx: ExecutionContext): boolean {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       ctx.getHandler(),
       ctx.getClass(),
     ]);
 
-    if (isPublic || token === process.env.BEARER_TOKEN) {
+    if (isPublic) {
       return true;
     }
 
-    if (!token) {
-      throw new UnauthorizedException([
-        'Unable to identify a valid bearer token',
-      ]);
-    }
+    const req = ctx.switchToHttp().getRequest();
+    const token = this.extractTokenFromHeader(req);
 
     try {
-      const payload = await this.jwtService.verifyAsync(token, {
+      const payload = this.jwtService.verify(token, {
         secret: process.env.JWT_SECRET,
       });
 
       req['seller'] = payload;
     } catch {
       throw new UnauthorizedException([
-        'Sign up, log in or purchase an access token',
+        'Unable to identify a valid bearer token',
       ]);
     }
 

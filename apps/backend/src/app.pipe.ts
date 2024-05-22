@@ -1,5 +1,6 @@
 import { Injectable, PipeTransform } from '@nestjs/common';
 import { isEmail } from 'class-validator';
+import { createHash } from 'crypto';
 
 @Injectable()
 export class AppPipeTransform implements PipeTransform {
@@ -7,7 +8,11 @@ export class AppPipeTransform implements PipeTransform {
     const sanitizedData: Record<string, any> = {};
     if (typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {
-        sanitizedData[key] = this.sanitizeValue(value);
+        if (key === 'password') {
+          sanitizedData[key] = this.passwordHash(value);
+        } else {
+          sanitizedData[key] = this.sanitizeValue(value);
+        }
       });
 
       return sanitizedData;
@@ -26,5 +31,11 @@ export class AppPipeTransform implements PipeTransform {
     }
 
     return value;
+  }
+
+  private passwordHash(password: string) {
+    return createHash('sha256')
+      .update(password + process.env.JWT_SECRET)
+      .digest('hex');
   }
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 import API from "../api/fetch";
@@ -9,16 +9,15 @@ import { useForm } from "../hooks/useForm";
 import { FormLayout } from "../layouts/FormLayout";
 
 export const SignInPage: React.FC = () => {
+  const { username, setUsername, password, setPassword } = useForm();
   const { signIn } = useAuth();
-  const {
-    username, setUsername,
-    password, setPassword
-  } = useForm();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (await API("signin", { username, password })) {
-      signIn({ username });
+    const seller = await API.post("sellers/signin", { username, password });
+
+    if (seller?.token) {
+      signIn(seller);
     }
   };
 

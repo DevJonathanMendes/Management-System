@@ -7,14 +7,20 @@ interface Props {
   children: React.ReactNode;
 }
 
+interface IUserToken {
+  id: string;
+  username: string;
+  token: string;
+}
+
 interface AuthContextProps {
-  user: { username: string } | null;
-  signIn: (data: { username: string }) => void;
+  user: IUserToken;
+  signIn: (data: IUserToken) => void;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextProps>({
-  user: null,
+  user: { id: "", username: "", token: "" },
   signIn: () => {},
   signOut: () => {},
 });
@@ -23,7 +29,7 @@ export const AuthProvider: React.FC<Props> = ({ children }) => {
   const [user, setUser] = useLocalStorage("user", null);
   const navigate = useNavigate();
 
-  const signIn = async (data: { username: string }) => {
+  const signIn = async (data: IUserToken) => {
     setUser(data);
     navigate("/protected");
   };

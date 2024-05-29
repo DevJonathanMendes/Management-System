@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -10,7 +9,6 @@ import {
 
 import { CreateSellerDto } from './dto/create-seller.dto';
 import { UpdateSellerDto } from './dto/update-seller.dto';
-import { SellerEntity } from './entities/seller.entity';
 import { SellersService } from './sellers.service';
 
 import { AuthService } from '../auth/auth.service';
@@ -55,10 +53,5 @@ export class SellersController {
     const newSeller = await this.sellersService.create(data);
 
     return this.authService.signToken(newSeller);
-  }
-
-  @Get()
-  findAll(): Promise<SellerEntity[]> {
-    return this.sellersService.findAll();
   }
 }

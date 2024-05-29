@@ -1,10 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { createHash } from 'crypto';
 
 import { UpdateSellerDto } from '../sellers/dto/update-seller.dto';
 import { SellerEntity } from '../sellers/entities/seller.entity';
-import { SellersService } from '../sellers/sellers.service';
 
 type IUserToken = {
   id: string;
@@ -34,7 +32,7 @@ export class AuthService {
 
     return {
       ...payload,
-      token: this.jwtService.sign({ payload }),
+      token: this.jwtService.sign({ ...payload }),
     };
   }
 }

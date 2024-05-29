@@ -4,34 +4,54 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useMemo } from "react";
+import { Customer } from "../interfaces/ISeller";
 
-export default function Table({ data }: { data: any[] }) {
-  const columns = useMemo<MRT_ColumnDef<any>[]>(
+export default function Table({ data }: { data: Customer[] }) {
+  const columns = useMemo<MRT_ColumnDef<Customer>[]>(
     () => [
       {
-        accessorKey: "name.firstName", //access nested data with dot notation
-        header: "First Name",
-        size: 150,
+        accessorKey: "id",
+        header: "ID",
+        // size: 150,
       },
       {
-        accessorKey: "name.lastName",
-        header: "Last Name",
-        size: 150,
+        accessorKey: "name",
+        header: "Name",
+        // size: 150,
+        muiEditTextFieldProps: {
+          required: true,
+          // error: "!!validationErrors?.firstName",
+          helperText: "validationErrors?.firstName",
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () => "hello",
+          /* setValidationErrors({
+              ...validationErrors,
+              firstName: undefined,
+            }), */
+          //optionally add validation checking for onBlur or onChange
+        },
       },
       {
-        accessorKey: "address", //normal accessorKey
-        header: "Address",
-        size: 200,
+        accessorKey: "email",
+        header: "E-mail",
+        // size: 150,
+      },
+
+      {
+        accessorKey: "phone",
+        header: "Phone",
+        // size: 150,
+      },
+
+      {
+        accessorKey: "updated",
+        header: "Updated",
+        // size: 150,
       },
       {
-        accessorKey: "city",
-        header: "City",
-        size: 150,
-      },
-      {
-        accessorKey: "state",
-        header: "State",
-        size: 150,
+        accessorKey: "created",
+        header: "Created",
+        // size: 150,
       },
     ],
     []
@@ -43,11 +63,16 @@ export default function Table({ data }: { data: any[] }) {
     layoutMode: "semantic",
     initialState: { density: "compact" },
     enableColumnResizing: true,
+    enableColumnOrdering: true,
+    enableColumnPinning: true,
     enableStickyHeader: true,
     enableStickyFooter: true,
 
+    columnResizeMode: "onEnd",
+
     muiTablePaperProps: {
       sx: {
+        flexGrow: "1",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -86,10 +111,11 @@ export default function Table({ data }: { data: any[] }) {
   return (
     <div
       style={{
-        backgroundColor: "green",
+        flexGrow: "1",
         display: "flex",
         minHeight: "720px",
         maxHeight: "720px",
+        padding: "1rem",
       }}
     >
       <MaterialReactTable table={table} />

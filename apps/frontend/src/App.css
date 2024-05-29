@@ -2,11 +2,10 @@ html,
 body {
   box-sizing: border-box !important;
 
-  min-width: 100% !important;
-  max-width: 100% !important;
-
-  min-height: 100% !important;
-  max-height: 100% !important;
+  min-width: 100vw !important;
+  max-width: 100vw !important;
+  min-height: 100vh !important;
+  max-height: 100vh !important;
 
   display: flex;
   flex-direction: column;
@@ -27,4 +26,8 @@ body {
 #root {
   /* background-color: darkblue !important; */
   /* max-height: 790px !important; */
+
+  /* flex-grow: 1; */
+  /* width: 100%; */
+  /* height: 100%; */
 }

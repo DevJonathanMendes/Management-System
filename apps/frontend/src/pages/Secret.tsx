@@ -18,7 +18,16 @@ export const Secret = () => {
   }, []);
 
   return (
-    <div>
+    <div
+      style={{
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+        // justifyContent: "space-between",
+        width: "100vw",
+        height: "100vh",
+      }}
+    >
       <div style={{}}>
         <header className="d-flex mx-2 justify-content-between align-items-center">
           <h1>Customers</h1>

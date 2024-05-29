@@ -1,10 +1,14 @@
 {
-  "name": "manager-system-server",
+  "name": "management-system-server",
   "version": "1.0.0",
   "description": "",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
+    "db:generate": "npx prisma generate",
+    "db:migrate:reset": "npx prisma migrate reset --force",
+    "db:migrate:dev": "npx prisma migrate dev --name init",
+    "db:migrate:deploy": "npx prisma migrate deploy",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
     "start:dev": "nest start --watch",

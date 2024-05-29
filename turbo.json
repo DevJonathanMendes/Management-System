@@ -1,8 +1,15 @@
 {
 	"$schema": "https://turbo.build/schema.json",
 	"pipeline": {
+		"db:generate": {},
+		"db:migrate:dev": {},
+		"db:migrate:deploy": {},
 		"start:dev": {
-			"cache": false
+			"cache": false,
+			"persistent": true,
+			"dependsOn": [
+				"db:generate"
+			]
 		},
 		"build": {
 			"dependsOn": [

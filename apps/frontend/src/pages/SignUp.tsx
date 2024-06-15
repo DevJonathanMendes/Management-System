@@ -1,61 +1,50 @@
-import { Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Button, Link, Typography } from "@mui/material";
+import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 
 import API from "../api/fetch";
-import { FormInput } from "../components/forms/FormInput";
+import InputEmail from "../components/forms/InputEmail";
+import InputPassword from "../components/forms/InputPassword";
+import InputUsername from "../components/forms/InputUsername";
 import { useAuth } from "../hooks/useAuth";
-import { useForm } from "../hooks/useForm";
 import { FormLayout } from "../layouts/FormLayout";
 
 export const SignUpPage = () => {
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const { signIn } = useAuth();
-  const { 
-    username, setUsername,
-    email, setEmail,
-    password, setPassword
-  } = useForm();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (await API("signup", { username, email, password })) {
-      signIn({ username });
+    const seller = await API.post("sellers/signup", {
+      username,
+      email,
+      password,
+    });
+
+    if (seller?.token) {
+      signIn(seller);
     }
   };
 
   return (
     <FormLayout onSubmit={handleSubmit}>
-      <h1>Create your account</h1>
-      <FormInput
-        label="Username"
-        type="text"
-        value={username}
-        onChange={setUsername}
-        placeholder="Enter username"
-        required
-      />
-      <FormInput
-        label="Email"
-        type="email"
-        value={email}
-        onChange={setEmail}
-        placeholder="Enter e-mail"
-        required
-      />
-      <FormInput
-        label="Password"
-        type="password"
-        value={password}
-        onChange={setPassword}
-        placeholder="Enter password"
-        required
-      />
-
-      <Button type="submit">Sing Up</Button>
-      <p className="text-center">
-        <small>
-          <Link to="/signin">Already have an account?</Link>
-        </small>
-      </p>
+      <Typography component="h1" variant="h4">
+        {"Create your account"}
+      </Typography>
+      <InputUsername value={username} onChange={setUsername} />
+      <InputEmail value={email} onChange={setEmail} />
+      <InputPassword value={password} onChange={setPassword} />
+      <Button type="submit" variant="contained">
+        {"Sign Up"}
+      </Button>
+      <Typography>
+        {"Already have an account? "}
+        <Link to="/signin" component={RouterLink}>
+          {"Sign In"}
+        </Link>
+      </Typography>
     </FormLayout>
   );
 };

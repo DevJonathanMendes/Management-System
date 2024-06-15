@@ -1,5 +1,6 @@
 export type Seller = {
   username: string;
+  email?: string;
   password: string;
 };
 

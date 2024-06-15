@@ -14,7 +14,9 @@ const API = {
       },
     });
 
-    return await res.json();
+    const json = await res.json();
+
+    return json;
   },
 
   get: async (path: string, token: string) => {
@@ -28,7 +30,9 @@ const API = {
       },
     });
 
-    return await res.json();
+    const json = await res.json();
+
+    return json;
   },
 };
 

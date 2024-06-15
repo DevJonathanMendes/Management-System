@@ -1,5 +1,5 @@
+import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
 
 import API from "../api/fetch";
 import Table from "../components/Table";
@@ -18,23 +18,41 @@ export const Secret = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        flexGrow: "1",
-        display: "flex",
-        flexDirection: "column",
-        // justifyContent: "space-between",
-        width: "100vw",
-        height: "100vh",
-      }}
+    <Box
+      sx={
+        {
+          // height: "100%",
+          // display: "flex",
+          // alignItems: "center",
+          // justifyContent: "center",
+          // textAlign: "center",
+        }
+      }
     >
-      <div style={{}}>
-        <header className="d-flex mx-2 justify-content-between align-items-center">
-          <h1>Customers</h1>
+      <Container>
+        <Typography
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          Customers
           <Button onClick={handleSignOut}>signOut</Button>
-        </header>
-      </div>
-      <Table data={customers} />
-    </div>
+        </Typography>
+        <Stack spacing={2}>
+          <Table data={customers} />
+        </Stack>
+      </Container>
+    </Box>
   );
 };
+
+/* style={{
+  flexGrow: "1",
+  display: "flex",
+  flexDirection: "column",
+  // alignItems: "center",
+  width: "100vw",
+  height: "100vh",
+}} */

@@ -1,8 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./hooks/useAuth";
-
 import { Home } from "./pages/Home";
 import { Secret } from "./pages/Secret";
 import { SignInPage } from "./pages/SignIn";

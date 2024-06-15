@@ -61,21 +61,23 @@ export default function Table({ data }: { data: Customer[] }) {
     columns,
     data,
     layoutMode: "semantic",
-    initialState: { density: "compact" },
-    enableColumnResizing: true,
-    enableColumnOrdering: true,
-    enableColumnPinning: true,
-    enableStickyHeader: true,
-    enableStickyFooter: true,
+    // initialState: { density: "compact" },
+
+    // enableDensityToggle: false,
+    // enableColumnResizing: true,
+    // enableColumnOrdering: true,
+    // enableColumnPinning: true,
+    // enableStickyHeader: true,
+    // enableStickyFooter: true,
 
     columnResizeMode: "onEnd",
 
     muiTablePaperProps: {
       sx: {
-        flexGrow: "1",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
+        // flexGrow: "1",
+        // display: "flex",
+        // flexDirection: "column",
+        // justifyContent: "space-between",
       },
     },
 
@@ -84,11 +86,19 @@ export default function Table({ data }: { data: Customer[] }) {
     },
     muiTableContainerProps: {
       sx: {
-        flexGrow: "1",
+        // flexGrow: "1",
       },
     },
     muiBottomToolbarProps: {
-      sx: {},
+      sx: {
+        // backgroundColor: "blue",
+        // padding: "2px",
+        // margin: "2px",
+        // display: "flex",
+        // maxWidth: "max-content",
+        // maxHeight: "max-content",
+        // maxHeight: "100px",
+      },
     },
 
     muiTableBodyRowProps: {
@@ -110,13 +120,16 @@ export default function Table({ data }: { data: Customer[] }) {
 
   return (
     <div
-      style={{
-        flexGrow: "1",
-        display: "flex",
-        minHeight: "720px",
-        maxHeight: "720px",
-        padding: "1rem",
-      }}
+      style={
+        {
+          // flexGrow: "1",
+          // display: "flex",
+          // minHeight: "720px",
+          // maxHeight: "720px",
+          // maxHeight: "max-content",
+          // padding: "1rem",
+        }
+      }
     >
       <MaterialReactTable table={table} />
     </div>

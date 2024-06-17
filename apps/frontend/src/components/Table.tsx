@@ -9,11 +9,11 @@ import { Customer } from "../interfaces/ISeller";
 export default function Table({ data }: { data: Customer[] }) {
   const columns = useMemo<MRT_ColumnDef<Customer>[]>(
     () => [
-      {
+      /* {
         accessorKey: "id",
         header: "ID",
         // size: 150,
-      },
+      }, */
       {
         accessorKey: "name",
         header: "Name",
@@ -36,14 +36,7 @@ export default function Table({ data }: { data: Customer[] }) {
         header: "E-mail",
         // size: 150,
       },
-
-      {
-        accessorKey: "phone",
-        header: "Phone",
-        // size: 150,
-      },
-
-      {
+      /*  {
         accessorKey: "updated",
         header: "Updated",
         // size: 150,
@@ -52,7 +45,7 @@ export default function Table({ data }: { data: Customer[] }) {
         accessorKey: "created",
         header: "Created",
         // size: 150,
-      },
+      }, */
     ],
     []
   );
@@ -61,23 +54,20 @@ export default function Table({ data }: { data: Customer[] }) {
     columns,
     data,
     layoutMode: "semantic",
-    // initialState: { density: "compact" },
-
+    initialState: { density: "compact" },
     // enableDensityToggle: false,
     // enableColumnResizing: true,
     // enableColumnOrdering: true,
     // enableColumnPinning: true,
     // enableStickyHeader: true,
     // enableStickyFooter: true,
-
     columnResizeMode: "onEnd",
 
     muiTablePaperProps: {
       sx: {
-        // flexGrow: "1",
-        // display: "flex",
-        // flexDirection: "column",
-        // justifyContent: "space-between",
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
       },
     },
 
@@ -86,19 +76,22 @@ export default function Table({ data }: { data: Customer[] }) {
     },
     muiTableContainerProps: {
       sx: {
-        // flexGrow: "1",
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
       },
     },
     muiBottomToolbarProps: {
       sx: {
-        // backgroundColor: "blue",
-        // padding: "2px",
-        // margin: "2px",
-        // display: "flex",
-        // maxWidth: "max-content",
-        // maxHeight: "max-content",
-        // maxHeight: "100px",
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "50px",
       },
+    },
+
+    muiTableProps: {
+      sx: {},
     },
 
     muiTableBodyRowProps: {
@@ -118,20 +111,5 @@ export default function Table({ data }: { data: Customer[] }) {
     },
   });
 
-  return (
-    <div
-      style={
-        {
-          // flexGrow: "1",
-          // display: "flex",
-          // minHeight: "720px",
-          // maxHeight: "720px",
-          // maxHeight: "max-content",
-          // padding: "1rem",
-        }
-      }
-    >
-      <MaterialReactTable table={table} />
-    </div>
-  );
+  return <MaterialReactTable table={table} />;
 }

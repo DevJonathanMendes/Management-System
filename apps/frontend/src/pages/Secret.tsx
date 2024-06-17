@@ -1,4 +1,4 @@
-import { Box, Button, Container, Stack, Typography } from "@mui/material";
+import { Box, Button, Container, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 import API from "../api/fetch";
@@ -12,23 +12,13 @@ export const Secret = () => {
   const handleSignOut = () => signOut();
 
   useEffect(() => {
-    API.get("customers", user.token).then((res: any) => {
-      setCustomers(res);
+    API.get("customers", user?.token).then((res: any) => {
+      if (res) setCustomers(res);
     });
   }, []);
 
   return (
-    <Box
-      sx={
-        {
-          // height: "100%",
-          // display: "flex",
-          // alignItems: "center",
-          // justifyContent: "center",
-          // textAlign: "center",
-        }
-      }
-    >
+    <Box height="100%" display="flex">
       <Container>
         <Typography
           sx={{
@@ -39,10 +29,11 @@ export const Secret = () => {
         >
           Customers
           <Button onClick={handleSignOut}>signOut</Button>
+          <Button>signOut</Button>
         </Typography>
-        <Stack spacing={2}>
+        <Box height="90%" display="flex">
           <Table data={customers} />
-        </Stack>
+        </Box>
       </Container>
     </Box>
   );

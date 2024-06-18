@@ -28,8 +28,7 @@ export const Secret = () => {
           }}
         >
           Customers
-          <Button onClick={handleSignOut}>signOut</Button>
-          <Button>signOut</Button>
+          <Button onClick={handleSignOut}>Sign out</Button>
         </Typography>
         <Box height="90%" display="flex">
           <Table data={customers} />
@@ -38,12 +37,3 @@ export const Secret = () => {
     </Box>
   );
 };
-
-/* style={{
-  flexGrow: "1",
-  display: "flex",
-  flexDirection: "column",
-  // alignItems: "center",
-  width: "100vw",
-  height: "100vh",
-}} */

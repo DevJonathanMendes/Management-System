@@ -22,7 +22,7 @@ export class CustomersController {
   @Post()
   create(@Req() req, @Body() data: CreateCustomerDto) {
     // Para mais segurança, é bom adotar mais formas de verificar a autenticidade da requisição.
-    data.sellerId = req.seller.id;
+    data.seller_id = req.seller.id;
     return this.customersService.create({ ...data });
   }
 

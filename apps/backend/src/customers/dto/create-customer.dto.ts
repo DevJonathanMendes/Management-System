@@ -11,5 +11,5 @@ export class CreateCustomerDto {
 
   @IsOptional()
   @IsString()
-  sellerId: string;
+  seller_id: string;
 }

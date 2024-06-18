@@ -4,8 +4,7 @@ export class CustomerEntity implements Customers {
   id: string;
   name: string;
   email: string;
-  phone: string;
-  sellerId: string;
+  seller_id: string;
   updated: Date;
   created: Date;
 }

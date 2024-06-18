@@ -1,20 +1,20 @@
-import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
+import { IsEmail, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreateSellerDto {
   @IsOptional()
   @IsString()
-  @Length(2, 64)
+  @MaxLength(64)
   name: string;
 
   @IsEmail()
-  @Length(2, 64)
+  @MaxLength(64)
   email: string;
 
   @IsString()
-  @Length(2, 64)
+  @MaxLength(64)
   username: string;
 
   @IsString()
-  @Length(8, 64)
+  @MaxLength(64)
   password: string;
 }

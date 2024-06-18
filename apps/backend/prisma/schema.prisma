@@ -19,12 +19,11 @@ model Sellers {
 }
 
 model Customers {
-  id       String   @id @default(uuid())
-  name     String
-  email    String
-  phone    String?
-  sellerId String
-  seller   Sellers  @relation(fields: [sellerId], references: [id])
-  updated  DateTime @updatedAt()
-  created  DateTime @default(now())
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  seller_id String
+  seller    Sellers  @relation(fields: [seller_id], references: [id])
+  updated   DateTime @updatedAt()
+  created   DateTime @default(now())
 }

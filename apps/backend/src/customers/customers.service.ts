@@ -20,13 +20,13 @@ export class CustomersService {
     });
   }
 
-  findManyWhere(sellerId: string) {
-    return this.prisma.customers.findMany({ where: { sellerId } });
+  findManyWhere(seller_id: string) {
+    return this.prisma.customers.findMany({ where: { seller_id } });
   }
 
-  findUnique(id: string, sellerId: string): Promise<CustomerEntity> {
+  findUnique(id: string, seller_id: string): Promise<CustomerEntity> {
     return this.prisma.customers.findUnique({
-      where: { id, AND: { sellerId } },
+      where: { id, AND: { seller_id } },
     });
   }
 

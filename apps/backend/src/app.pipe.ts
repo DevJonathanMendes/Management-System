@@ -6,6 +6,7 @@ import { createHash } from 'crypto';
 export class AppPipeTransform implements PipeTransform {
   transform(data: Record<string, any>) {
     const sanitizedData: Record<string, any> = {};
+
     if (typeof data === 'object') {
       Object.entries(data).forEach(([key, value]) => {
         if (key === 'password') {
@@ -34,6 +35,8 @@ export class AppPipeTransform implements PipeTransform {
   }
 
   private passwordHash(password: string) {
+    if (password.length < 0) return undefined;
+
     return createHash('sha256')
       .update(password + process.env.JWT_SECRET)
       .digest('hex');

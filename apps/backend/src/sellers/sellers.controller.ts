@@ -14,6 +14,7 @@ import { SellersService } from './sellers.service';
 import { AuthService } from '../auth/auth.service';
 import { Public } from '../auth/decorators/public.decorator';
 
+@Public()
 @Controller('sellers')
 export class SellersController {
   constructor(
@@ -21,7 +22,6 @@ export class SellersController {
     private authService: AuthService,
   ) {}
 
-  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
   async signIn(@Body() data: UpdateSellerDto) {
@@ -34,7 +34,6 @@ export class SellersController {
     return this.authService.signToken(seller, data);
   }
 
-  @Public()
   @Post('signup')
   async signin(@Body() data: CreateSellerDto) {
     const { username, email } = data;

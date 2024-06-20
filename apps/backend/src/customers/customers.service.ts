@@ -1,5 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
-
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
@@ -26,11 +25,11 @@ export class CustomersService {
 
   findUnique(id: string, seller_id: string): Promise<CustomerEntity> {
     return this.prisma.customers.findUnique({
-      where: { id, AND: { seller_id } },
+      where: { id, seller_id },
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} customer`;
+  remove(id: string, seller_id: string) {
+    return this.prisma.customers.delete({ where: { id, seller_id } });
   }
 }

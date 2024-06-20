@@ -1,8 +1,8 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Param,
   Patch,
@@ -20,22 +20,26 @@ export class CustomersController {
   constructor(private customersService: CustomersService) {}
 
   @Post()
-  create(@Req() req, @Body() data: CreateCustomerDto) {
+  create(
+    @Req() req: Request & { seller: { id: string } },
+    @Body() data: CreateCustomerDto,
+  ) {
     // Para mais segurança, é bom adotar mais formas de verificar a autenticidade da requisição.
     data.seller_id = req.seller.id;
-    return this.customersService.create({ ...data });
+    delete data.id;
+    return this.customersService.create(data);
   }
 
   @Get()
-  findAll(@Req() req) {
+  findAll(@Req() req: Request & { seller: { id: string } }) {
     return this.customersService.findManyWhere(req.seller.id);
   }
 
   @Patch(':id')
   async update(
     @Param('id') id: string,
+    @Req() req: Request & { seller: { id: string } },
     @Body() data: UpdateCustomerDto,
-    @Req() req,
   ) {
     const customer = await this.customersService.findUnique(id, req.seller.id);
 
@@ -43,17 +47,27 @@ export class CustomersController {
       throw new UnauthorizedException(['Customer does not exist']);
     }
 
+    delete data.id;
     return this.customersService.update(id, data);
   }
 
-  /* @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.customersService.findOne(+id);
+  @Get(':id')
+  findOne(
+    @Param('id') id: string,
+    @Req() req: Request & { seller: { id: string } },
+  ) {
+    return this.customersService.findUnique(id, req.seller.id);
   }
 
-
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.customersService.remove(+id);
-  } */
+  async remove(
+    @Param('id') id: string,
+    @Req() req: Request & { seller: { id: string } },
+  ) {
+    const customer = await this.customersService.findUnique(id, req.seller.id);
+
+    if (!customer) throw new BadRequestException(['Customer does not exist']);
+
+    return this.customersService.remove(id, req.seller.id);
+  }
 }

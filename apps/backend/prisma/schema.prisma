@@ -8,7 +8,7 @@ generator client {
 }
 
 model Sellers {
-  id        String      @id @default(uuid())
+  id        Int         @id @default(autoincrement())
   name      String?     @default("")
   email     String      @unique
   username  String      @unique
@@ -19,10 +19,10 @@ model Sellers {
 }
 
 model Customers {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   name      String
   email     String
-  seller_id String
+  seller_id Int
   seller    Sellers  @relation(fields: [seller_id], references: [id])
   updated   DateTime @updatedAt()
   created   DateTime @default(now())

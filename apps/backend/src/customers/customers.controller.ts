@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Req,
@@ -21,7 +22,7 @@ export class CustomersController {
 
   @Post()
   create(
-    @Req() req: Request & { seller: { id: string } },
+    @Req() req: Request & { seller: { id: number } },
     @Body() data: CreateCustomerDto,
   ) {
     // Para mais segurança, é bom adotar mais formas de verificar a autenticidade da requisição.
@@ -31,14 +32,14 @@ export class CustomersController {
   }
 
   @Get()
-  findAll(@Req() req: Request & { seller: { id: string } }) {
+  findAll(@Req() req: Request & { seller: { id: number } }) {
     return this.customersService.findManyWhere(req.seller.id);
   }
 
   @Patch(':id')
   async update(
-    @Param('id') id: string,
-    @Req() req: Request & { seller: { id: string } },
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
     @Body() data: UpdateCustomerDto,
   ) {
     const customer = await this.customersService.findUnique(id, req.seller.id);
@@ -53,16 +54,16 @@ export class CustomersController {
 
   @Get(':id')
   findOne(
-    @Param('id') id: string,
-    @Req() req: Request & { seller: { id: string } },
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
   ) {
     return this.customersService.findUnique(id, req.seller.id);
   }
 
   @Delete(':id')
   async remove(
-    @Param('id') id: string,
-    @Req() req: Request & { seller: { id: string } },
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
   ) {
     const customer = await this.customersService.findUnique(id, req.seller.id);
 

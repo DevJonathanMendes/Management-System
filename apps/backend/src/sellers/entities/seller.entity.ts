@@ -1,7 +1,7 @@
 import { Sellers } from '@prisma/client';
 
 export class SellerEntity implements Sellers {
-  id: string;
+  id: number;
   name: string;
   email: string;
   username: string;

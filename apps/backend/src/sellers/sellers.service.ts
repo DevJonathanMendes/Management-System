@@ -13,7 +13,7 @@ export class SellersService {
     return this.prisma.sellers.create({ data });
   }
 
-  update(id: string, data: UpdateSellerDto): Promise<SellerEntity> {
+  update(id: number, data: UpdateSellerDto): Promise<SellerEntity> {
     return this.prisma.sellers.update({ where: { id }, data });
   }
 

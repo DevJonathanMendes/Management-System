@@ -1,19 +1,17 @@
-import { IsEmail, IsNumber, IsNumberString, Length, Max, Min, Validate, isNumberString } from 'class-validator';
-import { IsPhone } from 'src/utils/IsPhone';
+import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
 
 export class CreateCustomerDto {
-  @Length(2, 32)
+  id: number;
+
+  @IsString()
+  @Length(2, 128)
   name: string;
 
   @IsEmail()
+  @Length(2, 128)
   email: string;
 
-  @Validate(IsPhone)
-  telephone: string;
-
-  @IsNumberString()
-  coordinate_x: number;
-
-  @IsNumberString()
-  coordinate_y: number;
+  @IsOptional()
+  @IsString()
+  seller_id: number;
 }

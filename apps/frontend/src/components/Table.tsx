@@ -1,41 +1,131 @@
-import { ICustomer } from "../interfaces/ICustomer";
+import {
+  MRT_ColumnDef,
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
+import { useMemo, useState } from "react";
+import { Customer } from "../interfaces/ISeller";
 
-const Tr = (props: { customer: ICustomer }) => {
-  const { customer } = props;
+type PropsTable = { data: Customer[] };
 
-  return (
-    <tr>
-      <th scope="row">{customer.id}</th>
-      <td>{customer?.name}</td>
-      <td>{customer?.email}</td>
-      <td>{customer?.telephone}</td>
-      <td>{customer?.coordinate_x}</td>
-      <td>{customer?.coordinate_y}</td>
-    </tr>
+export default function Table({ data }: PropsTable) {
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string | undefined>
+  >({});
+
+  const columns = useMemo<MRT_ColumnDef<Customer>[]>(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Name",
+        muiEditTextFieldProps: {
+          required: true,
+          error: !!validationErrors?.name,
+          helperText: validationErrors?.name,
+          //remove any previous validation errors when user focuses on the input
+          onFocus: () =>
+            setValidationErrors({
+              ...validationErrors,
+              name: undefined,
+            }),
+        },
+      },
+      {
+        id: "email",
+        accessorKey: "email",
+        header: "E-mail",
+      },
+      {
+        id: "updated",
+        accessorKey: "updated",
+        header: "Updated",
+        accessorFn: ({ updated }) => {
+          return new Date(updated).toLocaleDateString();
+        },
+      },
+      {
+        id: "created",
+        accessorKey: "created",
+        header: "Created",
+        accessorFn: ({ created }) => {
+          return new Date(created).toLocaleDateString();
+        },
+      },
+    ],
+    [validationErrors]
   );
-};
 
-export default function Table(props: { customers: ICustomer[] }) {
-  return (
-    <div className="overflow-table">
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">E-mail</th>
-            <th scope="col">Telephone</th>
-            <th scope="col">X</th>
-            <th scope="col">Y</th>
-          </tr>
-        </thead>
+  const table = useMaterialReactTable({
+    columns,
+    data,
+    initialState: {
+      density: "compact",
+      columnVisibility: {
+        created: false,
+        updated: false,
+      },
+    },
+    enableSorting: false,
+    enableRowSelection: false,
+    enableSortingRemoval: false,
+    enableFilters: false,
+    enableHiding: false,
+    enableDensityToggle: false,
+    enableStickyHeader: false,
+    enableRowActions: false,
+    enableStickyFooter: false,
+    enableColumnFilters: false,
+    enableColumnResizing: false,
+    enableColumnOrdering: false,
+    enableColumnPinning: false,
+    enableColumnActions: false,
+    columnResizeMode: "onEnd",
 
-        <tbody>
-          {props.customers.map((customer) => {
-            return <Tr key={customer.id} customer={customer} />;
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
+    muiTablePaperProps: {
+      sx: {
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+      },
+    },
+
+    muiTopToolbarProps: {
+      sx: {},
+    },
+    muiTableContainerProps: {
+      sx: {
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+      },
+    },
+    muiBottomToolbarProps: {
+      sx: {
+        flexGrow: "1",
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "50px",
+      },
+    },
+  });
+
+  return <MaterialReactTable table={table} />;
+}
+
+const validateRequired = (value: string) => !!value.length;
+
+const validateEmail = (email: string) =>
+  !!email.length &&
+  email
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+
+function validateUser(user: Customer) {
+  return {
+    name: !validateRequired(user.name) ? "Name is Required" : "",
+    email: !validateEmail(user.email) ? "Incorrect Email Format" : "",
+  };
 }

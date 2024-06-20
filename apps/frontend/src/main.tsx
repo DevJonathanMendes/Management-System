@@ -1,23 +1,19 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import App from "./App.tsx";
-import "./bootstrap.css";
-import Home from "./pages/Home.tsx";
+import { ThemeProvider } from "@emotion/react";
+import { CssBaseline } from "@mui/material";
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "home",
-    element: <Home />,
-  },
-]);
+import App from "./App.tsx";
+import theme from "./theme";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <CssBaseline />
+        <App />
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>
 );

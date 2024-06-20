@@ -2,62 +2,73 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   Param,
+  ParseIntPipe,
+  Patch,
   Post,
-  UsePipes,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { TransformDataPipe } from 'src/customers/customers.pipe';
+
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
-import { CustomerEntity } from './entities/customer.entity';
-import { faker } from '@faker-js/faker/locale/pt_BR';
+import { UpdateCustomerDto } from './dto/update-customer.dto';
 
 @Controller('customers')
 export class CustomersController {
-  constructor(private readonly customersService: CustomersService) { }
-
-  @Post('fake')
-  async createFake() {
-    const fake: CreateCustomerDto = {
-      name: faker.person.firstName(),
-      email: faker.internet.email(),
-      telephone: faker.phone.number(),
-      coordinate_x: faker.number.int({ min: 1, max: 100000 }),
-      coordinate_y: faker.number.int({ min: 1, max: 100000 })
-    }
-
-    return this.customersService.create(fake);
-  }
+  constructor(private customersService: CustomersService) {}
 
   @Post()
-  @UsePipes(new TransformDataPipe())
-  async create(@Body() data: CreateCustomerDto) {
-    const { email } = data;
-    const customer = await this.customersService.findOneByEmail(email);
-
-    if (customer) throw new BadRequestException(['email already exists']);
-
+  create(
+    @Req() req: Request & { seller: { id: number } },
+    @Body() data: CreateCustomerDto,
+  ) {
+    // Para mais segurança, é bom adotar mais formas de verificar a autenticidade da requisição.
+    data.seller_id = req.seller.id;
+    delete data.id;
     return this.customersService.create(data);
   }
 
   @Get()
-  findAll(): Promise<CustomerEntity[]> {
-    return this.customersService.findAll();
+  findAll(@Req() req: Request & { seller: { id: number } }) {
+    return this.customersService.findManyWhere(req.seller.id);
   }
 
-  @Get('calcPath')
-  calcPath() {
-    return 'calcPath';
+  @Patch(':id')
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
+    @Body() data: UpdateCustomerDto,
+  ) {
+    const customer = await this.customersService.findUnique(id, req.seller.id);
+
+    if (!customer) {
+      throw new UnauthorizedException(['Customer does not exist']);
+    }
+
+    delete data.id;
+    return this.customersService.update(id, data);
   }
 
-  @Get('email/:email')
-  findOneByEmail(@Param('email') email: string) {
-    return this.customersService.findOneByEmail(email);
+  @Get(':id')
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
+  ) {
+    return this.customersService.findUnique(id, req.seller.id);
   }
 
-  @Get('name/:name')
-  findOneByName(@Param('name') name: string) {
-    return this.customersService.findAnyByName(name);
+  @Delete(':id')
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request & { seller: { id: number } },
+  ) {
+    const customer = await this.customersService.findUnique(id, req.seller.id);
+
+    if (!customer) throw new BadRequestException(['Customer does not exist']);
+
+    return this.customersService.remove(id, req.seller.id);
   }
 }

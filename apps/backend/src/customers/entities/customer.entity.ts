@@ -1,9 +1,10 @@
-export class CustomerEntity {
-  id: string;
+import { Customers } from '@prisma/client';
+
+export class CustomerEntity implements Customers {
+  id: number;
   name: string;
   email: string;
-  telephone: string;
-  coordinate_x: number;
-  coordinate_y: number;
-  created_at: Date;
+  seller_id: number;
+  updated: Date;
+  created: Date;
 }

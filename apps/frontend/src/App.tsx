@@ -1,34 +1,30 @@
-import { Form } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
+import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AuthProvider } from "./hooks/useAuth";
+import { Home } from "./pages/Home";
+import { Secret } from "./pages/Secret";
+import { SignInPage } from "./pages/SignIn";
+import { SignUpPage } from "./pages/SignUp";
+
 import "./App.css";
 
 function App() {
   return (
-    <main className="form-signin text-center w-100 m-auto">
-      <Form action="/home">
-        <h1 className="h3 mb-3 fw-normal">Login</h1>
-        <div className="form-floating">
-          <input
-            type="text"
-            className="form-control"
-            placeholder="admin"
-            value="admin"
-          />
-          <label htmlFor="username">Username</label>
-        </div>
-        <div className="form-floating">
-          <input
-            type="password"
-            className="form-control"
-            placeholder="admin"
-            value="admin"
-          />
-          <label htmlFor="password">Password</label>
-        </div>
-        <button className="w-100 btn btn-lg btn-primary" type="submit">
-          Sign in
-        </button>
-      </Form>
-    </main>
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<SignInPage />} />
+        <Route path="/signup" element={<SignUpPage />} />
+        <Route
+          path="/protected"
+          element={
+            <ProtectedRoute>
+              <Secret />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
   );
 }
 

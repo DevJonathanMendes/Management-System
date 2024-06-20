@@ -10,6 +10,6 @@ export type Customer = {
   name: string;
   email: string;
   seller_id: string;
-  updated: Date;
-  created: Date;
+  updated: string;
+  created: string;
 };

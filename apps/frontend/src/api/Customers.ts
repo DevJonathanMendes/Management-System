@@ -1,0 +1,40 @@
+import { Customer } from "../interfaces/ISeller";
+
+class APICustomer {
+  constructor() {}
+
+  private API_URL = "http://localhost:3500/customers";
+
+  async create(body: Customer, token: String) {
+    const res = await fetch(this.API_URL, {
+      method: "POST",
+      mode: "cors",
+      signal: AbortSignal.timeout(3000),
+      body: JSON.stringify(body),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  }
+
+  async read(token: string) {
+    const res = await fetch(this.API_URL, {
+      method: "GET",
+      mode: "cors",
+      signal: AbortSignal.timeout(3000),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  }
+}
+
+export default new APICustomer() as APICustomer;

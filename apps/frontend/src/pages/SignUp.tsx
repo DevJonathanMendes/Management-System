@@ -52,7 +52,7 @@ export const SignUpPage = () => {
       <Typography component="h1" variant="h4">
         {"Create your account"}
       </Typography>
-      <InputName value={name} onChange={setName} />
+      <InputName value={name} onChange={setName} autoFocus={true} />
       <InputUsername value={username} onChange={setUsername} />
       <InputEmail value={email} onChange={setEmail} />
       <InputPassword value={password} onChange={setPassword} />

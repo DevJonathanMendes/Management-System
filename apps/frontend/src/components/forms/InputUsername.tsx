@@ -5,12 +5,14 @@ type InputUsernameProps = {
   value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
+  autoFocus?: boolean;
 };
 
 const InputUsername: React.FC<InputUsernameProps> = ({
   value,
   onChange,
   required = true,
+  autoFocus = false,
 }) => {
   return (
     <TextField
@@ -22,7 +24,7 @@ const InputUsername: React.FC<InputUsernameProps> = ({
       onChange={(e) => onChange(e.target.value)}
       type="text"
       required={required}
-      autoFocus
+      autoFocus={autoFocus}
       autoComplete="current-username"
     />
   );

@@ -5,12 +5,14 @@ type InputEmailProps = {
   value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
+  autoFocus?: boolean;
 };
 
 const InputEmail: React.FC<InputEmailProps> = ({
   value,
   onChange,
   required = true,
+  autoFocus = false,
 }) => {
   return (
     <TextField
@@ -22,7 +24,7 @@ const InputEmail: React.FC<InputEmailProps> = ({
       onChange={(e) => onChange(e.target.value)}
       type="email"
       required={required}
-      autoFocus
+      autoFocus={autoFocus}
       autoComplete="email"
     />
   );

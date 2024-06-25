@@ -27,7 +27,7 @@ export const SignInPage: React.FC = () => {
       <Typography component="h1" variant="h4">
         {"Login to your account"}
       </Typography>
-      <InputUsername value={username} onChange={setUsername} />
+      <InputUsername value={username} onChange={setUsername} autoFocus={true} />
       <InputPassword value={password} onChange={setPassword} />
       <Button type="submit" variant="contained">
         {"Sign In"}

@@ -5,12 +5,14 @@ type InputPasswordProps = {
   value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
+  autoFocus?: boolean;
 };
 
 const InputPassword: React.FC<InputPasswordProps> = ({
   value,
   onChange,
   required = true,
+  autoFocus = false,
 }) => {
   return (
     <TextField
@@ -22,7 +24,7 @@ const InputPassword: React.FC<InputPasswordProps> = ({
       onChange={(e) => onChange(e.target.value)}
       type="password"
       required={required}
-      autoFocus
+      autoFocus={autoFocus}
       autoComplete="current-password"
     />
   );

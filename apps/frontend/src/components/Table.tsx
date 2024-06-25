@@ -12,10 +12,13 @@ import {
 import {
   QueryClient,
   QueryClientProvider,
+  useMutation,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import {
   MRT_EditActionButtons,
+  MRT_TableOptions,
   MaterialReactTable,
   useMaterialReactTable,
   // createRow,
@@ -31,6 +34,28 @@ const TableCore = () => {
     Record<string, string | undefined>
   >({});
 
+  // call CREATE hook
+  const { mutateAsync: createCustomer, isPending: isCreatingCustomer } =
+    useCreateCustomer();
+
+  //CREATE action
+  const handleCreateCustomer: MRT_TableOptions<Customer>["onCreatingRowSave"] =
+    async ({ values, table }) => {
+      delete values.id;
+      delete values.created;
+      delete values.updated;
+      const newValidationErrors = validateCustomer(values);
+
+      if (Object.values(newValidationErrors).some((error) => error)) {
+        setValidationErrors(newValidationErrors);
+        return;
+      }
+
+      setValidationErrors({});
+      await createCustomer(values);
+      table.setCreatingRow(null); //exit creating mode
+    };
+
   //call READ hook
   const {
     data: customersData = [],
@@ -43,7 +68,7 @@ const TableCore = () => {
     () => [
       {
         accessorKey: "id",
-        header: "Id",
+        header: "ID",
         enableEditing: false,
         size: 0,
       },
@@ -85,6 +110,9 @@ const TableCore = () => {
         id: "updated",
         accessorKey: "updated",
         header: "Updated",
+        size: 0,
+        enableEditing: false,
+        Edit: () => null,
         accessorFn: ({ updated }) => {
           return new Date(updated).toLocaleDateString();
         },
@@ -93,6 +121,9 @@ const TableCore = () => {
         id: "created",
         accessorKey: "created",
         header: "Created",
+        size: 0,
+        enableEditing: false,
+        Edit: () => null,
         accessorFn: ({ created }) => {
           return new Date(created).toLocaleDateString();
         },
@@ -110,6 +141,7 @@ const TableCore = () => {
     state: {
       isLoading: isLoadingCustomers,
       // isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
+      isSaving: isCreatingCustomer,
       showAlertBanner: isLoadingCustomersError,
       showProgressBars: isFetchingCustomers,
     },
@@ -144,20 +176,20 @@ const TableCore = () => {
       : undefined,
     getRowId: (row) => row.id,
     onCreatingRowCancel: () => setValidationErrors({}),
-    // onCreatingRowSave: handleCreateCustomer,
+    onCreatingRowSave: handleCreateCustomer,
     onEditingRowCancel: () => setValidationErrors({}),
     // onEditingRowSave: handleSaveCustomer,
     //optionally customize modal content
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
-        <DialogTitle variant="h3">Create New Customer</DialogTitle>
+        <DialogTitle variant="h5">Create New Customer</DialogTitle>
         <DialogContent
           sx={{ display: "flex", flexDirection: "column", gap: "1rem" }}
         >
           {internalEditComponents} {/* or render custom edit components here */}
         </DialogContent>
         <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
+          <MRT_EditActionButtons variant="icon" table={table} row={row} />
         </DialogActions>
       </>
     ),
@@ -231,6 +263,25 @@ const TableCore = () => {
   return <MaterialReactTable table={table} />;
 };
 
+//CREATE hook (post new customer to api)
+function useCreateCustomer() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (customer: Customer) =>
+      await APICustomer.create(customer, user.token),
+
+    // Client side optimistic update.
+    onMutate: (newCustomerInfo: Customer) => {
+      queryClient.setQueryData(["customers"], (prevCustomers: any) => {
+        return [newCustomerInfo, ...prevCustomers] as Customer[];
+      });
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+  });
+}
+
 // READ hook (get users from api)
 function useGetCustomers() {
   const { user } = useAuth();
@@ -248,3 +299,21 @@ export const Table = () => (
     <TableCore />
   </QueryClientProvider>
 );
+
+const validateRequired = (value: string) => !!value.length;
+const validateEmail = (email: string) => {
+  return (
+    !!email.length &&
+    email
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      )
+  );
+};
+function validateCustomer(customer: Customer) {
+  return {
+    name: !validateRequired(customer.name) ? "Name is Required" : "",
+    email: !validateEmail(customer.email) ? "Incorrect Email Format" : "",
+  };
+}

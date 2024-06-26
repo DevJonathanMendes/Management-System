@@ -1,4 +1,4 @@
-import { Customer } from "../interfaces/ISeller";
+import { Customer, UpdatedCustomer } from "../interfaces/ISeller";
 
 class APICustomer {
   constructor() {}
@@ -26,6 +26,25 @@ class APICustomer {
       method: "GET",
       mode: "cors",
       signal: AbortSignal.timeout(3000),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  }
+
+  async update(body: UpdatedCustomer, token: string) {
+    delete body.created;
+    delete body.updated;
+
+    const res = await fetch(`${this.API_URL}/${body.id}`, {
+      method: "PATCH",
+      mode: "cors",
+      signal: AbortSignal.timeout(3000),
+      body: JSON.stringify(body),
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",

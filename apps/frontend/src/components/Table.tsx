@@ -25,9 +25,9 @@ import {
   type MRT_ColumnDef,
 } from "material-react-table";
 import { useMemo, useState } from "react";
-import { Customer } from "../interfaces/ISeller";
-import { useAuth } from "../hooks/useAuth";
 import APICustomer from "../api/Customers";
+import { useAuth } from "../hooks/useAuth";
+import { Customer } from "../interfaces/ISeller";
 
 const TableCore = () => {
   const [validationErrors, setValidationErrors] = useState<
@@ -63,6 +63,23 @@ const TableCore = () => {
     isFetching: isFetchingCustomers,
     isLoading: isLoadingCustomers,
   } = useGetCustomers();
+
+  // call UPDATE hook
+  const { mutateAsync: updateCustomer, isPending: isUpdatingCustomer } =
+    useUpdateCustomer();
+
+  //UPDATE action
+  const handleSaveCustomer: MRT_TableOptions<Customer>["onEditingRowSave"] =
+    async ({ values, table }) => {
+      const newValidationErrors = validateCustomer(values);
+      if (Object.values(newValidationErrors).some((error) => error)) {
+        setValidationErrors(newValidationErrors);
+        return;
+      }
+      setValidationErrors({});
+      await updateCustomer(values);
+      table.setEditingRow(null); //exit editing mode
+    };
 
   const columns = useMemo<MRT_ColumnDef<Customer>[]>(
     () => [
@@ -113,9 +130,7 @@ const TableCore = () => {
         size: 0,
         enableEditing: false,
         Edit: () => null,
-        accessorFn: ({ updated }) => {
-          return new Date(updated).toLocaleDateString();
-        },
+        accessorFn: ({ updated }) => new Date(updated).toLocaleDateString(),
       },
       {
         id: "created",
@@ -124,9 +139,7 @@ const TableCore = () => {
         size: 0,
         enableEditing: false,
         Edit: () => null,
-        accessorFn: ({ created }) => {
-          return new Date(created).toLocaleDateString();
-        },
+        accessorFn: ({ created }) => new Date(created).toLocaleDateString(),
       },
     ],
     [validationErrors]
@@ -141,7 +154,7 @@ const TableCore = () => {
     state: {
       isLoading: isLoadingCustomers,
       // isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
-      isSaving: isCreatingCustomer,
+      isSaving: isCreatingCustomer || isUpdatingCustomer,
       showAlertBanner: isLoadingCustomersError,
       showProgressBars: isFetchingCustomers,
     },
@@ -178,7 +191,7 @@ const TableCore = () => {
     onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateCustomer,
     onEditingRowCancel: () => setValidationErrors({}),
-    // onEditingRowSave: handleSaveCustomer,
+    onEditingRowSave: handleSaveCustomer,
     //optionally customize modal content
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
@@ -203,7 +216,7 @@ const TableCore = () => {
           {internalEditComponents} {/* or render custom edit components here */}
         </DialogContent>
         <DialogActions>
-          <MRT_EditActionButtons variant="text" table={table} row={row} />
+          <MRT_EditActionButtons variant="icon" table={table} row={row} />
         </DialogActions>
       </>
     ),
@@ -263,7 +276,7 @@ const TableCore = () => {
   return <MaterialReactTable table={table} />;
 };
 
-//CREATE hook (post new customer to api)
+// CREATE hook (post new customer to api)
 function useCreateCustomer() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
@@ -290,6 +303,29 @@ function useGetCustomers() {
     queryKey: ["customers"],
     refetchOnWindowFocus: false,
     queryFn: () => APICustomer.read(user.token),
+  });
+}
+
+// UPDATE hook (put user in api)
+function useUpdateCustomer() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (customer: Customer) =>
+      await APICustomer.update(customer, user.token),
+
+    // Client side optimistic update
+    onMutate: (newCustomerInfo: Customer) => {
+      queryClient.setQueryData(["customers"], (prevCustomers: Customer[]) =>
+        prevCustomers?.map((prevCustomer: Customer) =>
+          prevCustomer.id === newCustomerInfo.id
+            ? newCustomerInfo
+            : prevCustomer
+        )
+      );
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
   });
 }
 

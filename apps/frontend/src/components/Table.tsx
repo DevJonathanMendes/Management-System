@@ -18,6 +18,7 @@ import {
 } from "@tanstack/react-query";
 import {
   MRT_EditActionButtons,
+  MRT_Row,
   MRT_TableOptions,
   MaterialReactTable,
   useMaterialReactTable,
@@ -68,7 +69,7 @@ const TableCore = () => {
   const { mutateAsync: updateCustomer, isPending: isUpdatingCustomer } =
     useUpdateCustomer();
 
-  //UPDATE action
+  // UPDATE action
   const handleSaveCustomer: MRT_TableOptions<Customer>["onEditingRowSave"] =
     async ({ values, table }) => {
       const newValidationErrors = validateCustomer(values);
@@ -80,6 +81,17 @@ const TableCore = () => {
       await updateCustomer(values);
       table.setEditingRow(null); //exit editing mode
     };
+
+  // call DELETE hook
+  const { mutateAsync: deleteCustomer, isPending: isDeletingCustomer } =
+    useDeleteCustomer();
+
+  // DELETE action
+  const openDeleteConfirmModal = (row: MRT_Row<Customer>) => {
+    if (window.confirm("Are you sure you want to delete this customer?")) {
+      deleteCustomer(row.original.id);
+    }
+  };
 
   const columns = useMemo<MRT_ColumnDef<Customer>[]>(
     () => [
@@ -97,7 +109,7 @@ const TableCore = () => {
           required: true,
           error: !!validationErrors?.name,
           helperText: validationErrors?.name,
-          //remove any previous validation errors when user focuses on the input
+          //remove any previous validation errors when customer focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
@@ -115,7 +127,7 @@ const TableCore = () => {
           required: true,
           error: !!validationErrors?.email,
           helperText: validationErrors?.email,
-          //remove any previous validation errors when user focuses on the input
+          //remove any previous validation errors when customer focuses on the input
           onFocus: () =>
             setValidationErrors({
               ...validationErrors,
@@ -153,8 +165,7 @@ const TableCore = () => {
     enableEditing: true,
     state: {
       isLoading: isLoadingCustomers,
-      // isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
-      isSaving: isCreatingCustomer || isUpdatingCustomer,
+      isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
       showAlertBanner: isLoadingCustomersError,
       showProgressBars: isFetchingCustomers,
     },
@@ -228,8 +239,7 @@ const TableCore = () => {
           </IconButton>
         </Tooltip>
         <Tooltip title="Delete">
-          {/* <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}> */}
-          <IconButton color="error" onClick={() => {}}>
+          <IconButton color="error" onClick={() => openDeleteConfirmModal(row)}>
             <DeleteIcon />
           </IconButton>
         </Tooltip>
@@ -291,11 +301,11 @@ function useCreateCustomer() {
         return [newCustomerInfo, ...prevCustomers] as Customer[];
       });
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
   });
 }
 
-// READ hook (get users from api)
+// READ hook (get customers from api)
 function useGetCustomers() {
   const { user } = useAuth();
 
@@ -306,7 +316,7 @@ function useGetCustomers() {
   });
 }
 
-// UPDATE hook (put user in api)
+// UPDATE hook (put customer in api)
 function useUpdateCustomer() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -325,7 +335,28 @@ function useUpdateCustomer() {
         )
       );
     },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['users'] }), //refetch users after mutation, disabled for demo
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
+  });
+}
+
+// DELETE hook (delete customer in api)
+function useDeleteCustomer() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  return useMutation({
+    mutationFn: async (customerId: string) =>
+      await APICustomer.delete(customerId, user.token),
+
+    //client side optimistic update
+    onMutate: (customerId: string) => {
+      queryClient.setQueryData(["customers"], (prevCustomers: any) =>
+        prevCustomers?.filter(
+          (customer: Customer) => customer.id !== customerId
+        )
+      );
+    },
+    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
   });
 }
 

@@ -54,6 +54,21 @@ class APICustomer {
 
     return await res.json();
   }
+
+  async delete(id: string, token: string) {
+    const res = await fetch(`${this.API_URL}/${id}`, {
+      method: "DELETE",
+      mode: "cors",
+      signal: AbortSignal.timeout(3000),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    return await res.json();
+  }
 }
 
 export default new APICustomer() as APICustomer;

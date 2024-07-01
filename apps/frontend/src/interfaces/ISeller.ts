@@ -13,3 +13,12 @@ export type Customer = {
   updated: string;
   created: string;
 };
+
+export type UpdatedCustomer = {
+  id: string;
+  name?: string;
+  email?: string;
+  seller_id?: string;
+  updated?: string;
+  created?: string;
+};

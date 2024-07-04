@@ -12,8 +12,6 @@ import {
 import {
   QueryClient,
   QueryClientProvider,
-  useMutation,
-  useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
 import {
@@ -22,29 +20,48 @@ import {
   MRT_TableOptions,
   MaterialReactTable,
   useMaterialReactTable,
-  // createRow,
-  type MRT_ColumnDef,
 } from "material-react-table";
-import { useMemo, useState } from "react";
-import APICustomer from "../api/Customers";
+import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Customer } from "../interfaces/ISeller";
+import { columnsConfig } from "./Columns";
+import {
+  useCreateCustomer,
+  useDeleteCustomer,
+  useGetCustomers,
+  useUpdateCustomer,
+} from "./TableQueries";
 
 const TableCore = () => {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+
   const [validationErrors, setValidationErrors] = useState<
     Record<string, string | undefined>
   >({});
 
-  // call CREATE hook
   const { mutateAsync: createCustomer, isPending: isCreatingCustomer } =
-    useCreateCustomer();
+    useCreateCustomer(user.token, queryClient);
 
-  //CREATE action
+  const {
+    data: customersData = [],
+    isError: isLoadingCustomersError,
+    isFetching: isFetchingCustomers,
+    isLoading: isLoadingCustomers,
+  } = useGetCustomers(user.token);
+
+  const { mutateAsync: updateCustomer, isPending: isUpdatingCustomer } =
+    useUpdateCustomer(user.token, queryClient);
+
+  const { mutateAsync: deleteCustomer, isPending: isDeletingCustomer } =
+    useDeleteCustomer(user.token, queryClient);
+
   const handleCreateCustomer: MRT_TableOptions<Customer>["onCreatingRowSave"] =
     async ({ values, table }) => {
       delete values.id;
       delete values.created;
       delete values.updated;
+
       const newValidationErrors = validateCustomer(values);
 
       if (Object.values(newValidationErrors).some((error) => error)) {
@@ -54,22 +71,9 @@ const TableCore = () => {
 
       setValidationErrors({});
       await createCustomer(values);
-      table.setCreatingRow(null); //exit creating mode
+      table.setCreatingRow(null);
     };
 
-  //call READ hook
-  const {
-    data: customersData = [],
-    isError: isLoadingCustomersError,
-    isFetching: isFetchingCustomers,
-    isLoading: isLoadingCustomers,
-  } = useGetCustomers();
-
-  // call UPDATE hook
-  const { mutateAsync: updateCustomer, isPending: isUpdatingCustomer } =
-    useUpdateCustomer();
-
-  // UPDATE action
   const handleSaveCustomer: MRT_TableOptions<Customer>["onEditingRowSave"] =
     async ({ values, table }) => {
       const newValidationErrors = validateCustomer(values);
@@ -79,104 +83,21 @@ const TableCore = () => {
       }
       setValidationErrors({});
       await updateCustomer(values);
-      table.setEditingRow(null); //exit editing mode
+      table.setEditingRow(null);
     };
 
-  // call DELETE hook
-  const { mutateAsync: deleteCustomer, isPending: isDeletingCustomer } =
-    useDeleteCustomer();
-
-  // DELETE action
   const openDeleteConfirmModal = (row: MRT_Row<Customer>) => {
     if (window.confirm("Are you sure you want to delete this customer?")) {
       deleteCustomer(row.original.id);
     }
   };
 
-  const columns = useMemo<MRT_ColumnDef<Customer>[]>(
-    () => [
-      {
-        accessorKey: "id",
-        header: "ID",
-        enableEditing: false,
-        size: 0,
-      },
-      {
-        accessorKey: "name",
-        header: "Name",
-        size: 0,
-        muiEditTextFieldProps: {
-          required: true,
-          error: !!validationErrors?.name,
-          helperText: validationErrors?.name,
-          //remove any previous validation errors when customer focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              name: undefined,
-            }),
-          //optionally add validation checking for onBlur or onChange
-        },
-      },
-      {
-        accessorKey: "email",
-        header: "Email",
-        size: 0,
-        muiEditTextFieldProps: {
-          type: "email",
-          required: true,
-          error: !!validationErrors?.email,
-          helperText: validationErrors?.email,
-          //remove any previous validation errors when customer focuses on the input
-          onFocus: () =>
-            setValidationErrors({
-              ...validationErrors,
-              email: undefined,
-            }),
-        },
-      },
-      {
-        id: "updated",
-        accessorKey: "updated",
-        header: "Updated",
-        size: 0,
-        enableEditing: false,
-        Edit: () => null,
-        accessorFn: ({ updated }) => new Date(updated).toLocaleDateString(),
-      },
-      {
-        id: "created",
-        accessorKey: "created",
-        header: "Created",
-        size: 0,
-        enableEditing: false,
-        Edit: () => null,
-        accessorFn: ({ created }) => new Date(created).toLocaleDateString(),
-      },
-    ],
-    [validationErrors]
-  );
-
   const table = useMaterialReactTable({
-    columns,
+    columns: columnsConfig(validationErrors, setValidationErrors),
     data: customersData,
-    createDisplayMode: "modal", // default ('row', and 'custom' are also available).
-    editDisplayMode: "modal", // default ('row', 'cell', 'table', and 'custom' are also available).
+    createDisplayMode: "modal",
+    editDisplayMode: "modal",
     enableEditing: true,
-    state: {
-      isLoading: isLoadingCustomers,
-      isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
-      showAlertBanner: isLoadingCustomersError,
-      showProgressBars: isFetchingCustomers,
-    },
-    initialState: {
-      density: "compact",
-      columnVisibility: {
-        id: false,
-        created: false,
-        updated: false,
-      },
-    },
     enableSorting: false,
     enableSortingRemoval: false,
     enableFilters: false,
@@ -192,6 +113,20 @@ const TableCore = () => {
     enableColumnPinning: false,
     enableColumnActions: false,
     columnResizeMode: "onEnd",
+    initialState: {
+      density: "compact",
+      columnVisibility: {
+        id: false,
+        created: false,
+        updated: false,
+      },
+    },
+    state: {
+      isLoading: isLoadingCustomers,
+      isSaving: isCreatingCustomer || isUpdatingCustomer || isDeletingCustomer,
+      showAlertBanner: isLoadingCustomersError,
+      showProgressBars: isFetchingCustomers,
+    },
     muiToolbarAlertBannerProps: isLoadingCustomersError
       ? {
           color: "error",
@@ -199,11 +134,10 @@ const TableCore = () => {
         }
       : undefined,
     getRowId: (row) => row.id,
-    onCreatingRowCancel: () => setValidationErrors({}),
     onCreatingRowSave: handleCreateCustomer,
-    onEditingRowCancel: () => setValidationErrors({}),
     onEditingRowSave: handleSaveCustomer,
-    //optionally customize modal content
+    onCreatingRowCancel: () => setValidationErrors({}),
+    onEditingRowCancel: () => setValidationErrors({}),
     renderCreateRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h5">Create New Customer</DialogTitle>
@@ -217,7 +151,6 @@ const TableCore = () => {
         </DialogActions>
       </>
     ),
-    //optionally customize modal content
     renderEditRowDialogContent: ({ table, row, internalEditComponents }) => (
       <>
         <DialogTitle variant="h4">Edit Customer</DialogTitle>
@@ -285,80 +218,6 @@ const TableCore = () => {
 
   return <MaterialReactTable table={table} />;
 };
-
-// CREATE hook (post new customer to api)
-function useCreateCustomer() {
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
-
-  return useMutation({
-    mutationFn: async (customer: Customer) =>
-      await APICustomer.create(customer, user.token),
-
-    // Client side optimistic update.
-    onMutate: (newCustomerInfo: Customer) => {
-      queryClient.setQueryData(["customers"], (prevCustomers: any) => {
-        return [newCustomerInfo, ...prevCustomers] as Customer[];
-      });
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
-  });
-}
-
-// READ hook (get customers from api)
-function useGetCustomers() {
-  const { user } = useAuth();
-
-  return useQuery<Customer[]>({
-    queryKey: ["customers"],
-    refetchOnWindowFocus: false,
-    queryFn: () => APICustomer.read(user.token),
-  });
-}
-
-// UPDATE hook (put customer in api)
-function useUpdateCustomer() {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (customer: Customer) =>
-      await APICustomer.update(customer, user.token),
-
-    // Client side optimistic update
-    onMutate: (newCustomerInfo: Customer) => {
-      queryClient.setQueryData(["customers"], (prevCustomers: Customer[]) =>
-        prevCustomers?.map((prevCustomer: Customer) =>
-          prevCustomer.id === newCustomerInfo.id
-            ? newCustomerInfo
-            : prevCustomer
-        )
-      );
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
-  });
-}
-
-// DELETE hook (delete customer in api)
-function useDeleteCustomer() {
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
-
-  return useMutation({
-    mutationFn: async (customerId: string) =>
-      await APICustomer.delete(customerId, user.token),
-
-    //client side optimistic update
-    onMutate: (customerId: string) => {
-      queryClient.setQueryData(["customers"], (prevCustomers: any) =>
-        prevCustomers?.filter(
-          (customer: Customer) => customer.id !== customerId
-        )
-      );
-    },
-    // onSettled: () => queryClient.invalidateQueries({ queryKey: ['customers'] }), //refetch customers after mutation, disabled for demo
-  });
-}
 
 const queryClient = new QueryClient();
 export const Table = () => (

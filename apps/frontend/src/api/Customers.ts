@@ -1,11 +1,11 @@
-import { Customer, UpdatedCustomer } from "../interfaces/ISeller";
+import { CreateCustomer, UpdateCustomer } from "../interfaces/ISeller";
 
 class APICustomer {
   constructor() {}
 
   private API_URL = "http://localhost:3500/customers";
 
-  async create(body: Customer, token: String) {
+  async create(body: CreateCustomer, token: String) {
     const res = await fetch(this.API_URL, {
       method: "POST",
       mode: "cors",
@@ -36,7 +36,7 @@ class APICustomer {
     return await res.json();
   }
 
-  async update(body: UpdatedCustomer, token: string) {
+  async update(body: UpdateCustomer, token: string) {
     delete body.created;
     delete body.updated;
 

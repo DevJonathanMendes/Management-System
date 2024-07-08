@@ -1,4 +1,4 @@
-import { CreateCustomer, UpdateCustomer } from "../interfaces/ISeller";
+import { CreateCustomer, UpdateCustomer } from "../types/Customer";
 
 class APICustomer {
   constructor() {}

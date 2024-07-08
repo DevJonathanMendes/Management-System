@@ -1,6 +1,6 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
-import APICustomer from "../api/Customers";
-import { CreateCustomer, Customer } from "../interfaces/ISeller";
+import APICustomer from "../api/FetchCustomers";
+import { CreateCustomer, Customer } from "../types/Customer";
 
 export function useCreateCustomer(token: string, queryClient: QueryClient) {
   return useMutation({

@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Button, Link, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import API from "../api/fetch";
+import FetchSellers from "../api/FetchSellers";
 import InputEmail from "../components/forms/InputEmail";
 import InputName from "../components/forms/InputName";
 import InputPassword from "../components/forms/InputPassword";
@@ -32,7 +32,7 @@ export const SignUpPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const seller = await API.post("sellers/signup", {
+      const seller = await FetchSellers.signup({
         name: name.length > 0 ? name : undefined,
         username,
         email,

@@ -1,6 +1,6 @@
 import { MRT_ColumnDef } from "material-react-table";
 import { useMemo } from "react";
-import { Customer } from "../interfaces/ISeller";
+import { Customer } from "../types/Customer";
 
 export function columnsConfig(validationErrors: any, setValidationErrors: any) {
   const columns = useMemo<MRT_ColumnDef<Customer>[]>(

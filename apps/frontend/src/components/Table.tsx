@@ -23,7 +23,7 @@ import {
 } from "material-react-table";
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Customer } from "../interfaces/ISeller";
+import { Customer } from "../types/Customer";
 import { columnsConfig } from "./Columns";
 import {
   useCreateCustomer,

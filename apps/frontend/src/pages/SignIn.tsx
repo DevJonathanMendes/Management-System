@@ -1,12 +1,11 @@
 import { Button, Link, Typography } from "@mui/material";
 import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-
-import API from "../api/fetch";
 import InputPassword from "../components/forms/InputPassword";
 import InputUsername from "../components/forms/InputUsername";
 import { useAuth } from "../hooks/useAuth";
 import { FormLayout } from "../layouts/FormLayout";
+import APISeller from "../api/FetchSellers";
 
 export const SignInPage: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -15,7 +14,7 @@ export const SignInPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const seller = await API.post("sellers/signin", { username, password });
+    const seller = await APISeller.signin({ username, password });
 
     if (seller?.token) {
       signIn(seller);

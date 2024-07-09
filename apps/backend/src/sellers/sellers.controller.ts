@@ -35,7 +35,7 @@ export class SellersController {
   }
 
   @Post('signup')
-  async signin(@Body() data: CreateSellerDto) {
+  async signUp(@Body() data: CreateSellerDto) {
     const { username, email } = data;
     const partners = await this.sellersService.findAny({ username }, { email });
 

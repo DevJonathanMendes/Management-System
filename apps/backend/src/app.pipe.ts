@@ -34,11 +34,11 @@ export class AppPipeTransform implements PipeTransform {
     return value;
   }
 
+  // Pode ser melhorado usando salt.
   private passwordHash(password: string) {
-    if (password.length < 0) return undefined;
-
-    return createHash('sha256')
-      .update(password + process.env.JWT_SECRET)
-      .digest('hex');
+    if (password.length >= 2)
+      return createHash('sha256')
+        .update(password + process.env.JWT_SECRET)
+        .digest('hex');
   }
 }

@@ -5,6 +5,8 @@ type InputEmailProps = {
   value: string;
   onChange: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
+  error?: boolean;
+  helperText?: string;
   autoFocus?: boolean;
 };
 
@@ -12,6 +14,8 @@ const InputEmail: React.FC<InputEmailProps> = ({
   value,
   onChange,
   required = true,
+  error = false,
+  helperText,
   autoFocus = false,
 }) => {
   return (
@@ -24,6 +28,8 @@ const InputEmail: React.FC<InputEmailProps> = ({
       onChange={(e) => onChange(e.target.value)}
       type="email"
       required={required}
+      error={error}
+      helperText={helperText}
       autoFocus={autoFocus}
       autoComplete="email"
     />

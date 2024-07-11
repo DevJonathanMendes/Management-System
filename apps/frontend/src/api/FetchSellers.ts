@@ -25,10 +25,10 @@ class APISeller {
       },
     });
 
-    return await res.json();
+    return res.json();
   }
 
-  async get(token: string) {
+  private async get(token: string) {
     const res = await fetch(this.API_URL, {
       method: "GET",
       mode: "cors",

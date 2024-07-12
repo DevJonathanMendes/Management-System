@@ -3,7 +3,7 @@ import React from "react";
 
 type InputEmailProps = {
   value: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
   error?: boolean;
   helperText?: string;
@@ -12,7 +12,7 @@ type InputEmailProps = {
 
 const InputEmail: React.FC<InputEmailProps> = ({
   value,
-  onChange,
+  setValue,
   required = true,
   error = false,
   helperText,
@@ -25,7 +25,7 @@ const InputEmail: React.FC<InputEmailProps> = ({
       label="E-mail"
       placeholder="Enter e-mail"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => setValue(e.target.value)}
       type="email"
       required={required}
       error={error}

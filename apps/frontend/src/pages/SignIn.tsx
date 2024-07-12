@@ -47,7 +47,7 @@ export const SignInPage: React.FC = () => {
     setPassword(value);
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const res = await APISeller.signin({ username, password });
@@ -68,7 +68,7 @@ export const SignInPage: React.FC = () => {
 
       setErrors({ ...errors });
     }
-  };
+  }
 
   return (
     <FormLayout onSubmit={handleSubmit}>
@@ -77,13 +77,13 @@ export const SignInPage: React.FC = () => {
       </Typography>
       <InputUsername
         value={username}
-        onChange={handleUsername}
+        setValue={handleUsername}
         helperText={errors.username.message}
         error={errors.username.error}
       />
       <InputPassword
         value={password}
-        onChange={handlePassword}
+        setValue={handlePassword}
         helperText={errors.password.message}
         error={errors.password.error}
       />

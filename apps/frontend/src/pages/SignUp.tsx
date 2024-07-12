@@ -69,7 +69,7 @@ export const SignUpPage = () => {
     setPassword(value);
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     const res = await FetchSellers.signup({
@@ -99,30 +99,30 @@ export const SignUpPage = () => {
 
       setErrors({ ...errors });
     }
-  };
+  }
 
   return (
     <FormLayout onSubmit={handleSubmit}>
       <Typography component="h1" variant="h4">
         {"Create your account"}
       </Typography>
-      <InputName value={name} onChange={setName} autoFocus={true} />
+      <InputName value={name} setValue={setName} autoFocus={true} />
       <InputUsername
         value={username}
-        onChange={handleUsername}
+        setValue={handleUsername}
         helperText={errors.username.message}
         error={errors.username.error}
       />
 
       <InputEmail
         value={email}
-        onChange={HandleEmail}
+        setValue={HandleEmail}
         helperText={errors.email.message}
         error={errors.email.error}
       />
       <InputPassword
         value={password}
-        onChange={handlePassword}
+        setValue={handlePassword}
         helperText={errors.password.message}
         error={errors.password.error}
       />

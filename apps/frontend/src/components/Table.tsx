@@ -180,9 +180,9 @@ const TableCore = () => {
     ),
     renderTopToolbarCustomActions: ({ table }) => (
       <>
-        <Tooltip title="ADDER">
+        <Tooltip title="Add new customer">
           <IconButton onClick={() => table.setCreatingRow(true)}>
-            <AddIcon>a</AddIcon>
+            <AddIcon />
           </IconButton>
         </Tooltip>
       </>

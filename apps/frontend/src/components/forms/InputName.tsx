@@ -3,14 +3,14 @@ import React from "react";
 
 type InputUsernameProps = {
   value: string;
-  onChange: React.Dispatch<React.SetStateAction<string>>;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
   required?: boolean;
   autoFocus?: boolean;
 };
 
 const InputName: React.FC<InputUsernameProps> = ({
   value,
-  onChange,
+  setValue,
   required = false,
   autoFocus = false,
 }) => {
@@ -21,7 +21,7 @@ const InputName: React.FC<InputUsernameProps> = ({
       label="Name"
       placeholder="Enter name"
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(e) => setValue(e.target.value)}
       type="text"
       required={required}
       autoFocus={autoFocus}

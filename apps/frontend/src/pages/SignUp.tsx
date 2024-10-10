@@ -1,62 +1,138 @@
-import { faker } from "@faker-js/faker";
 import { Button, Link, Typography } from "@mui/material";
-import { useState } from "react";
+import { SetStateAction, useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
-import API from "../api/fetch";
+import FetchSellers from "../api/FetchSellers";
 import InputEmail from "../components/forms/InputEmail";
 import InputName from "../components/forms/InputName";
 import InputPassword from "../components/forms/InputPassword";
 import InputUsername from "../components/forms/InputUsername";
 import { useAuth } from "../hooks/useAuth";
 import { FormLayout } from "../layouts/FormLayout";
+import createFakeUser from "../utils/fakeUser";
 
 export const SignUpPage = () => {
-  const fakeFirstName = faker.person.firstName();
-  const fakeLastName = faker.person.lastName();
-  const fakeUsername = faker.internet.userName({
-    firstName: fakeFirstName,
-    lastName: fakeLastName,
-  });
-  const fakeEmail = faker.internet.email({
-    firstName: fakeFirstName,
-    lastName: fakeLastName,
-    provider: "email.com",
-  });
-
-  const [name, setName] = useState<string>(fakeFirstName);
-  const [username, setUsername] = useState<string>(fakeUsername);
-  const [password, setPassword] = useState<string>("admin");
-  const [email, setEmail] = useState<string>(fakeEmail);
   const { signIn } = useAuth();
+  const fakeUser = createFakeUser();
+  const [name, setName] = useState<string>(fakeUser.firstName);
+  const [username, setUsername] = useState<string>(fakeUser.username);
+  const [password, setPassword] = useState<string>("admin");
+  const [email, setEmail] = useState<string>(fakeUser.email);
+  const [errors, setErrors] = useState({
+    username: { error: false, message: "" },
+    email: { error: false, message: "" },
+    password: { error: false, message: "" },
+  });
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  function handleUsername(value: SetStateAction<string>) {
+    if (typeof value === "string") {
+      const trimmedValue = value.replace(/\s/g, ""); // Remove espaços.
+      const lengthValidation = trimmedValue.length < 2;
+
+      setErrors((prevValues) => ({
+        ...prevValues,
+        username: {
+          error: lengthValidation,
+          message: lengthValidation ? "Must be at least 2 characters long" : "",
+        },
+      }));
+
+      setUsername(trimmedValue);
+    }
+  }
+
+  function HandleEmail(value: SetStateAction<string>) {
+    const lengthValidation = value.length <= 0;
+
+    setErrors((prevValues) => {
+      prevValues.email = {
+        error: lengthValidation,
+        message: lengthValidation ? "Must be at least 0 characters long" : "",
+      };
+
+      return prevValues;
+    });
+
+    setEmail(value);
+  }
+
+  function handlePassword(value: SetStateAction<string>) {
+    const lengthValidation = value.length < 2;
+
+    setErrors((prevValues) => ({
+      ...prevValues,
+      password: {
+        error: lengthValidation,
+        message: lengthValidation ? "Must be at least 2 characters long" : "",
+      },
+    }));
+
+    setPassword(value);
+  }
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    try {
-      const seller = await API.post("sellers/signup", {
-        name: name.length > 0 ? name : undefined,
-        username,
-        email,
-        password,
+
+    const res = await FetchSellers.signup({
+      name: name.length > 0 ? name : undefined,
+      username,
+      email,
+      password,
+    });
+
+    if (res.token) {
+      signIn(res);
+    } else {
+      res.message.forEach((msg: string) => {
+        if (msg.includes("username")) {
+          errors.username.error = true;
+          errors.username.message = msg;
+        }
+        if (msg.includes("email")) {
+          errors.email.error = true;
+          errors.email.message = msg;
+        }
+        if (msg.includes("password")) {
+          errors.password.error = true;
+          errors.password.message = msg;
+        }
       });
 
-      if (seller?.token) {
-        signIn(seller);
-      }
-    } catch (err) {
-      console.log("SIGNUP ERROR:", err);
+      setErrors({ ...errors });
     }
-  };
+  }
 
   return (
     <FormLayout onSubmit={handleSubmit}>
       <Typography component="h1" variant="h4">
         {"Create your account"}
       </Typography>
-      <InputName value={name} onChange={setName} autoFocus={true} />
-      <InputUsername value={username} onChange={setUsername} />
-      <InputEmail value={email} onChange={setEmail} />
-      <InputPassword value={password} onChange={setPassword} />
-      <Button type="submit" variant="contained">
+      <InputName value={name} setValue={setName} autoFocus={true} />
+      <InputUsername
+        value={username}
+        setValue={handleUsername}
+        helperText={errors.username.message}
+        error={errors.username.error}
+      />
+
+      <InputEmail
+        value={email}
+        setValue={HandleEmail}
+        helperText={errors.email.message}
+        error={errors.email.error}
+      />
+      <InputPassword
+        value={password}
+        setValue={handlePassword}
+        helperText={errors.password.message}
+        error={errors.password.error}
+      />
+      <Button
+        type="submit"
+        variant="contained"
+        disabled={
+          errors.email.error || errors.username.error || errors.password.error
+        }
+      >
         {"Sign Up"}
       </Button>
       <Typography>
